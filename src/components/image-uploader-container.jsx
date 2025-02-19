@@ -23,6 +23,13 @@ export default function ImageUploaderContainer() {
   const onImageSelection = (imgUrl) => {
     setSelectedImage(imgUrl);
   };
+
+  const deletePhoto = (imgUrl) => {
+    setImages((prev) =>
+      prev.map((photo) => (!!photo && photo.imgUrl === imgUrl ? null : photo))
+    );
+    selectedImage === imgUrl && setSelectedImage("");
+  };
   return (
     <div className="h-[600px] w-[500px] sm:bg-white sm:rounded-3xl p-4">
       <section className="h-[210px] w-full bg-gray-200 rounded-2xl flex items-center justify-center py-3">
@@ -34,6 +41,7 @@ export default function ImageUploaderContainer() {
         onImageSelection={onImageSelection}
         handleImageChange={handleImageChange}
         selectedImage={selectedImage}
+        deletePhoto={deletePhoto}
       />
     </div>
   );

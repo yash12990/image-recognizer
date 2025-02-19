@@ -1,8 +1,8 @@
 import React from "react";
 import Image from "next/image";
-import PlusIcon from "../../public/svgs/plus-icon.svg";
+import PlusIcon from "../../public/images/plus-icon.svg";
 
-export default function AddImageButton({ image, handleImageChange }) {
+export default function AddImageButton({ handleImageChange }) {
   return (
     <label>
       <input
@@ -21,8 +21,5 @@ export default function AddImageButton({ image, handleImageChange }) {
         <p>Upload</p>
       </section>
     </label>
-    //     </>
-    //   )}
-    // </>
   );
 }
