@@ -25,7 +25,9 @@ export default function ImageUploaderContainer() {
     setSelectedImage(imgUrl);
   };
 
-  const deletePhoto = (imgUrl) => {
+  const deletePhoto = (e, imgUrl) => {
+    e.stopPropagation();
+
     setImages((prev) =>
       prev.map((photo) => (!!photo && photo.imgUrl === imgUrl ? null : photo))
     );
@@ -41,7 +43,7 @@ export default function ImageUploaderContainer() {
     }
   };
   return (
-    <div className="h-[600px] w-[500px] sm:bg-white sm:rounded-3xl p-4">
+    <div className="h-[650px] w-[500px] sm:bg-white sm:rounded-3xl p-4">
       <section className="h-[210px] w-full bg-gray-200 rounded-2xl flex items-center justify-center py-3">
         <ImagePreview selectedImage={selectedImage} />
       </section>

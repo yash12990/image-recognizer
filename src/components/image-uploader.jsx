@@ -21,9 +21,9 @@ export default function ImageUploader({
             key={index}
             onClick={() => onImageSelection(image.imgUrl)}
             className={cn(
-              "rounded-lg border-2 border-black border-dashed w-[120px] h-[80px] flex items-center justify-center p-1 relative",
+              "rounded-lg border-2 sm:border-black border-gray-400 border-dashed sm:w-[120px] w-20 h-20 flex items-center justify-center p-1 relative",
               selectedImage === image.imgUrl &&
-                "border-solid border-[#3d206e] border-[3px]"
+                "border-solid sm:border-[#3d206e] border-white border-[3px]"
             )}
           >
             <Image
@@ -35,7 +35,7 @@ export default function ImageUploader({
             />
 
             <button
-              onClick={() => deletePhoto(image.imgUrl)}
+              onClick={(e) => deletePhoto(e, image.imgUrl)}
               className="absolute w-6 h-6 bg-slate-200 border-black border-[0.5px] -bottom-[6px] -right-[5px] flex items-center justify-center rounded-full hover:scale-[1.2] transition"
             >
               <Image
