@@ -10,7 +10,7 @@ export default function ImagePreview({ selectedImage }) {
           alt="Image"
           width={500}
           height={220}
-          className="w-fit max-h-[220px]"
+          className="w-fit max-h-[190px]"
         />
       ) : (
         <div className="w-full h-full text-center flex items-center justify-center">
