@@ -6,7 +6,7 @@ export default function Home() {
     <div className="">
       <Header />
 
-      <main className="w-full flex items-center justify-center pt-10">
+      <main className="w-full flex items-center justify-center sm:pt-10">
         <ImageUploaderContainer />
       </main>
     </div>
