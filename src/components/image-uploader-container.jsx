@@ -2,25 +2,44 @@
 
 import React, { useState } from "react";
 import ImagePreview from "./image-preview";
-import ImageUploader from "./image-uploader";
 import toast from "react-hot-toast";
-import { submitImages } from "@/api";
+import { submitImages, uploadImages } from "@/api.js";
+import ImageUploader from "./image-uploader.jsx";
 
 export default function ImageUploaderContainer() {
   const [images, setImages] = useState(Array(3).fill(null));
+  const [isUploading, setIsUploading] = useState(false);
   const [selectedImage, setSelectedImage] = useState("");
-  const [promptNumber, setPromptNumber] = useState("1");
+  const [promptNumber, setPromptNumber] = useState(1);
+  const [aiResponse, setAiResponse] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    setImages((prev) => {
-      const newPhotos = [...prev];
-      const emptyIndex = newPhotos.findIndex((photo) => photo === null);
-      if (emptyIndex !== -1) {
-        newPhotos[emptyIndex] = { ...file, imgUrl: URL.createObjectURL(file) };
-      }
-      return newPhotos;
-    });
+  const handleImageChange = async (event, index) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    setIsUploading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
+
+      const res = await uploadImages(formData);
+      const imageUrl = res.data;
+
+      const newImages = [...images];
+      newImages[index] = { imgUrl: imageUrl };
+      setImages(newImages);
+
+      onImageSelection(imageUrl);
+
+      event.target.value = "";
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      toast.error("Error uploading image");
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const onImageSelection = (imgUrl) => {
@@ -35,32 +54,58 @@ export default function ImageUploaderContainer() {
   const deletePhoto = (e, imgUrl) => {
     e.stopPropagation();
 
-    setImages((prev) =>
-      prev.map((photo) => (!!photo && photo.imgUrl === imgUrl ? null : photo))
+    const indexToDelete = images.findIndex(
+      (img) => img && img.imgUrl === imgUrl
     );
-    selectedImage === imgUrl && setSelectedImage("");
+    if (indexToDelete !== -1) {
+      const newImages = [...images];
+      newImages[indexToDelete] = null;
+      setImages(newImages);
+
+      if (selectedImage === imgUrl) {
+        setSelectedImage(null);
+      }
+    }
+
+    // e.stopPropagation();
+
+    // setImages((prev) =>
+    //   prev.map((photo) => (!!photo && photo.imgUrl === imgUrl ? null : photo))
+    // );
+    // selectedImage === imgUrl && setSelectedImage("");
   };
 
-  const onSubmit = async () => {
+  const onSubmit = async (event) => {
+    event.preventDefault();
+
     if (images.length === 0) {
       alert("Please select at least one image");
       return;
     }
 
-    const formData = new FormData();
-    // images.forEach((image, index) => {
-    formData.append(`files`, images);
-    // });
+    const imageUrls = images
+      .filter((img) => img !== null)
+      .map((img) => img.imgUrl);
 
-    formData.append(`promptNumber`, promptNumber);
-
+    const payload = { images: imageUrls, promptNumber };
     try {
-      const res = await submitImages(formData);
-      console.log("🚀 ~ onSubmit ~ res:", res);
-      // throw new Error("Cannot submit image");
+      setIsSubmitting(true);
+
+      const res = await submitImages(payload);
+      if (res.code < 400) {
+        toast.success("Images submitted successfully!");
+        setImages(Array(3).fill(null));
+        setSelectedImage("");
+        setAiResponse(res.data);
+      } else {
+        toast.error("Failed in submitting images");
+        console.error("Failed in submitting images: ", res);
+      }
     } catch (error) {
       console.log("Error in submitting images: ", error);
       toast.error("Error submitting images");
+    } finally {
+      setIsSubmitting(false);
     }
   };
   return (
@@ -71,30 +116,30 @@ export default function ImageUploaderContainer() {
         onChange={onPromptSelection}
         className="absolute top-28"
       >
-        <option value="1">Wrong Item</option>
-        <option value="2">Missing Item</option>
-        <option value="3">Item</option>
+        <option value={1}>Wrong Item</option>
+        <option value={2}>Missing Item</option>
+        <option value={3}>Item</option>
       </select>
 
-      <div className="h-[650px] w-[500px] sm:bg-white sm:rounded-3xl p-4">
+      <div className="h-[650px] w-[500px] sm:bg-white sm:rounded-3xl p-4 flex flex-col">
         <section className="h-[210px] w-full bg-gray-200 rounded-2xl flex items-center justify-center py-3">
           <ImagePreview selectedImage={selectedImage} />
         </section>
 
-        <ImageUploader
-          images={images}
-          onImageSelection={onImageSelection}
-          handleImageChange={handleImageChange}
-          selectedImage={selectedImage}
-          deletePhoto={deletePhoto}
-        />
-
-        <button
-          className="w-full h-10 bg-[#512771] mt-5 text-base font-semibold text-white rounded-lg shadow-lg hover:opacity-85 transition-all duration-300 flex items-center justify-center text-center"
-          onClick={onSubmit}
-        >
-          Submit
-        </button>
+        <div className="flex-1">
+          <ImageUploader
+            images={images}
+            onImageChange={handleImageChange}
+            onImageSelection={onImageSelection}
+            deletePhoto={deletePhoto}
+            onSubmit={onSubmit}
+            selectedImage={selectedImage}
+            handleImageChange={handleImageChange}
+            isUploading={isUploading}
+            isSubmitting={isSubmitting}
+            aiResponse={aiResponse}
+          />
+        </div>
       </div>
     </>
   );
