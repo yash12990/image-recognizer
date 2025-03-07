@@ -80,7 +80,10 @@ export default function ImageUploaderContainer() {
       .filter((img) => img !== null)
       .map((img) => img.imgUrl);
 
-    const payload = { images: imageUrls, promptNumber };
+    const payload = {
+      images: imageUrls,
+      promptNumber: promptNumber.toString(),
+    };
     console.log("🚀 ~ onSubmit ~ payload:", payload);
     try {
       setIsSubmitting(true);
