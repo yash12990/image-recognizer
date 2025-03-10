@@ -84,7 +84,6 @@ export default function ImageUploaderContainer() {
       images: imageUrls,
       promptNumber: promptNumber.toString(),
     };
-    console.log("🚀 ~ onSubmit ~ payload:", payload);
     try {
       setIsSubmitting(true);
 
