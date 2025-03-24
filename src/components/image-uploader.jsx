@@ -23,8 +23,8 @@ export default function ImageUploader({
         {images.map((image, index) =>
           image === null ? (
             <section key={index} className="flex flex-col items-center gap-1">
-              <label>
-                {index === 0 ? "Picker" : index === 1 ? "Packer" : "Customer"}
+              <label className="sm:text-black text-white">
+                {index === 0 ? "Dark Store" : index === 1 ? "Rider" : "Customer"}
               </label>
 
               <AddImageButton
